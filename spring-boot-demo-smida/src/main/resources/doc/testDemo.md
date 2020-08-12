@@ -41,7 +41,7 @@ public class DemoTest {
 | @Rule | @ExtendWith | Rule是一组实现了TestRule接口的共享类，提供了验证、监视TestCase和外部资源管理等能力 |
 | @ClassRule | @ExtendWith | @ClassRule用于测试类中的静态变量，必须是TestRule接口的实例，且访问修饰符必须为public。 |
 
-## 2.mockmvc
+## 2.mock
 mock是指在测试过程中，对于一些不容易构造/获取的对象，创建一个mock对象来模拟对象的行为
 
 - 在做单元测试过程中，经常会有以下的场景：
@@ -61,9 +61,10 @@ class D dependence ...
 单元测试/接口测试中测试对象依赖其他对象，这些对象的构造复杂、耗时或者根本无法构造(未交付)
 我们只测试对象内部逻辑的质量，不关心依赖对象的逻辑正确性和稳定性
 
+### 2.1 mockmvc
 MockMvc是由spring-test包提供，实现了对Http请求的模拟，能够直接使用网络的形式，转换到Controller的调用，使得测试速度快、不依赖网络环境。同时提供了一套验证的工具，结果的验证十分方便。
 
-mockmvc的初始化方式有两种
+- 初始化方式
 ```java
 //方式一
 @SpringBootTest
@@ -78,7 +79,7 @@ public class DemoTest1 {
 
     @Before
     public void setup() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).alwaysDo(print()).build();  //构造MockMvc
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();  //构造MockMvc
         cookies = new Cookie[3];
         Cookie cookie1 = new Cookie("SESSION", "dev-test");
         cookies[0] = cookie1;
@@ -94,3 +95,35 @@ public class DemoTest1 {
     public MockMvc mockMvc;
 }
 ```
+- 基本流程：
+准备测试环境
+通过MockMvc执行请求
+添加验证断言
+添加结果处理器
+得到MvcResult进行自定义断言/进行下一步的异步请求
+卸载测试环境
+
+例如：
+```java
+@Test
+public void demoTest3() throws Exception {
+    //mockMvc.perform执行一个请求；
+    //MockMvcRequestBuilders.get("/url/u1")构造一个请求
+    MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/url/u1"))
+        //ResultActions.andExpect添加执行完成后的断言
+        .andExpect(MockMvcResultMatchers.view().name("user/view"))
+        .andExpect(MockMvcResultMatchers.model().attributeExists("username"))
+        .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+        //ResultActions.andDo添加一个结果处理器，表示要对结果做点什么事情
+        //比如此处使用MockMvcResultHandlers.print()输出整个响应结果信息。
+        .andDo(MockMvcResultHandlers.print())
+        //ResultActions.andReturn表示执行完成后返回相应的结果。
+        .andReturn();
+    Assert.assertNotNull(result.getModelAndView().getModel().get("username"));
+}
+```
+- 
+
+
+
+各种请求方式的mockMvc demo如下：

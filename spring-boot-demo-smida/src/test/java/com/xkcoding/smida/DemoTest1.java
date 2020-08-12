@@ -1,6 +1,7 @@
 package com.xkcoding.smida;
 
 import com.xkcoding.smida.testDemo.XXXDao;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,6 +15,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.result.ModelResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -51,6 +57,17 @@ public class DemoTest1 {
         xxxDao = Mockito.mock(XXXDao.class);
         Mockito.when(xxxDao.getMapBySql()).thenReturn(2);
         System.out.println(xxxDao.getMapBySql());
+    }
+
+    @Test
+    public void demoTest3() throws Exception {
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/url/u1"))
+            .andExpect(MockMvcResultMatchers.view().name("user/view"))
+            .andExpect(MockMvcResultMatchers.model().attributeExists("username"))
+            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+            .andDo(MockMvcResultHandlers.print())
+            .andReturn();
+        Assert.assertNotNull(result.getModelAndView().getModel().get("username"));
     }
 
 }
