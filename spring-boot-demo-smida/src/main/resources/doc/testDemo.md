@@ -244,9 +244,11 @@ CookieResultMatchers cookie()//得到响应Cookie验证器
 
 ContentResultMatchers content()//得到响应内容验证器
 
-JsonPathResultMatchers jsonPath(String expression, Object ... args)/ResultMatcher jsonPath  (String expression, Matcher matcher)//得到Json表达式验证器
+JsonPathResultMatchers jsonPath(String expression, Object ... args)
+ResultMatcher jsonPath  (String expression, Matcher matcher)//得到Json表达式验证器
 
-XpathResultMatchers xpath(String expression, Object... args)/XpathResultMatchers xpath(String expression, Map<string, string=""> namespaces, Object... args)//得到Xpath表达式验证器
+XpathResultMatchers xpath(String expression, Object... args)
+XpathResultMatchers xpath(String expression, Map<String, String> namespaces, Object... args)//得到Xpath表达式验证器
 
 ResultMatcher forwardedUrl(final String expectedUrl)//验证处理完请求后转发的url（绝对匹配）
 
@@ -256,4 +258,119 @@ ResultMatcher redirectedUrl(final String expectedUrl)//验证处理完请求后�
 
 ResultMatcher redirectedUrlPattern(final String expectedUrl)//验证处理完请求后重定向的url（Ant风格模式匹配，@since spring4）
 ```
+
+- MockMvcResultHandlers
+结果处理器，表示要对结果做点什么事情
+常使用的比如 `MockMvcResultHandlers.print()` 输出整个响应结果信息
+
+- MvcResult
+单元测试执行结果，可以针对执行结果进行自定义验证逻辑。自定义断言验证数据。
 各种请求方式的mockMvc demo如下：
+
+### 2.1.4 常用示例
+- get
+```java
+MvcResult result = mockMvc.perform(
+            MockMvcRequestBuilders.get("/getTest")
+            .param("key", "value")
+            .param("key2", "value2")
+            .header("", ""))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andDo(MockMvcResultHandlers.print()).andReturn();
+```
+- postJson
+```java
+MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/postTest")
+            .contentType(MediaType.APPLICATION_JSON_UTF8)
+            .content(json))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andDo(MockMvcResultHandlers.print()).andReturn();
+```
+- multipartFileUpload
+```java
+//同时传递json和上传文件
+File file = new file("a.txt");
+MockMultipartFile jsonFile = new MockMultipartFile("jsonParam", null, MediaType.APPLICATION_JSON, JSON.toJSONString(jsonObject).getBytes());
+MockMultipartFile mFile = new MockMultipartFile("file", "a.txt", null, new FileInputStream(file));
+long start = System.currentTimeMillis();
+mockMvc.perform(MockMvcRequestBuilders.multipart("/open/asr/uploadTask")
+        .file(jsonFile)
+        .file(mFile)
+        .header("header", header)
+        .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+```
+
+
+## 2.2 mock对象
+有时测试对象依赖其他对象，这些对象的构造复杂、耗时或者根本无法构造(未交付)，就需要mock所需对象进行测试。
+
+- Mockito.mock
+mock()方法可以创建类或接口的模拟对象。
+我们可以使用mock来指定方法的行为，并验证它们是否被调用。
+```java
+@Test
+public void givenCountMethodMocked_WhenCountInvoked_ThenMockedValueReturned() {
+    //mock对象
+    UserRepository localMockRepository = Mockito.mock(UserRepository.class);
+    //指定mock对象的行为
+    Mockito.when(localMockRepository.count()).thenReturn(0L);
+ 
+    //调用mock对象
+    long userCount = localMockRepository.count();
+ 
+    Assert.assertEquals(0L, userCount);
+    //验证localMockRepository的方法被调用
+    Mockito.verify(localMockRepository).count();
+}
+```
+- @Mock注解
+Mock注解实际上是mockito.mock()方法的缩写,同样，我们应该只在测试类中使用它。
+  
+与mock()方法不同，我们需要启用mockito注解来使用此注解。我们可以通过使用mockitojunitrunner运行测试或显式调用mockitoannotations.initmocks()方法来实现这一点。
+    
+```java
+@RunWith(MockitoJUnitRunner.class)
+public class MockAnnotationUnitTest {
+     
+    @Mock
+    UserRepository mockRepository;
+     
+    @Test
+    public void givenCountMethodMocked_WhenCountInvoked_ThenMockValueReturned() {
+        Mockito.when(mockRepository.count()).thenReturn(123L);
+ 
+        long userCount = mockRepository.count();
+ 
+        Assert.assertEquals(123L, userCount);
+        Mockito.verify(mockRepository).count();
+    }
+}
+```
+相比较mock方法，Mock注解除了使代码更易读之外，还可以在出现故障时更容易找到问题，因为在错误消息中会出现字段名称。
+```java
+Wanted but not invoked:
+mockRepository.count();
+......
+Actually, there were zero interactions with this mock.
+```
+
+- MockBean注解
+  我们可以使用@mockBean注解将Mock对象添加到Spring上下文中。
+  
+  Mock将替换Spring上下文中任何相同类型的现有bean，如果没有定义相同类型的bean，将添加一个新的bean。
+  
+  MockBean注解在集成测试中很有用，在集成测试中需要模拟特定bean，例如外部Service。
+  
+  如果需要使用Mockbean注解,需要使用SpringRunner(Junit5 中是SpringExtention)
+  
+```java
+    public void demoTest1() {
+//        mockMvc = MockMvcBuilders.standaloneSetup(XXXController.class).build();
+        Mockito.when(xxxDao.getMapBySql()).thenReturn(1);
+
+        //MockBean mock的对象会自动注入到上下文中
+        XXXDao xxxDao1 = applicationContext.getBean(XXXDao.class);
+        System.out.println(xxxDao1.getMapBySql());
+        System.out.println(xxxDao.getMapBySql());
+    }
+```
