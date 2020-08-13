@@ -1,4 +1,4 @@
-package com.xkcoding.smida;
+package com.xkcoding.smida.testDemo;
 
 import com.xkcoding.smida.testDemo.XXXController;
 import com.xkcoding.smida.testDemo.XXXDao;
@@ -33,7 +33,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
  * @author Created by YangYifan on 2020/8/11.
  */
 @SpringBootTest
-@ActiveProfiles
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc //该注解将会自动配置mockMvc的单元测试
 public class DemoTest1 {
@@ -47,20 +46,20 @@ public class DemoTest1 {
     @Test
     public void demoTest1() {
 //        mockMvc = MockMvcBuilders.standaloneSetup(XXXController.class).build();
-        Mockito.when(xxxDao.getMapBySql()).thenReturn(1);
+        Mockito.when(xxxDao.getCountSql()).thenReturn(1);
 
         //MockBean mock的对象会自动注入到上下文中
         XXXDao xxxDao1 = applicationContext.getBean(XXXDao.class);
-        System.out.println(xxxDao1.getMapBySql());
-        System.out.println(xxxDao.getMapBySql());
+        System.out.println(xxxDao1.getCountSql());
+        System.out.println(xxxDao.getCountSql());
     }
 
     @Test
     public void demoTest2() {
         xxxDao = Mockito.mock(XXXDao.class);
-        Mockito.when(xxxDao.getMapBySql()).thenReturn(2);
-        System.out.println(xxxDao.getMapBySql());
-        Mockito.verify(xxxDao).getMapBySql();
+        Mockito.when(xxxDao.getCountSql()).thenReturn(2);
+        System.out.println(xxxDao.getCountSql());
+        Mockito.verify(xxxDao).getCountSql();
     }
 
     @Test
