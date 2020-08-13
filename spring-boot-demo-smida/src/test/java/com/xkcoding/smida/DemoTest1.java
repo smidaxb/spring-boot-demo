@@ -1,5 +1,6 @@
 package com.xkcoding.smida;
 
+import com.xkcoding.smida.testDemo.XXXController;
 import com.xkcoding.smida.testDemo.XXXDao;
 import org.junit.Assert;
 import org.junit.Before;
@@ -43,7 +44,8 @@ public class DemoTest1 {
     private XXXDao xxxDao;
 
     @Test
-    public void demoTest1(){
+    public void demoTest1() {
+//        mockMvc = MockMvcBuilders.standaloneSetup(XXXController.class).build();
         Mockito.when(xxxDao.getMapBySql()).thenReturn(1);
 
         //MockBean mock的对象会自动注入到上下文中
@@ -53,7 +55,7 @@ public class DemoTest1 {
     }
 
     @Test
-    public void demoTest2(){
+    public void demoTest2() {
         xxxDao = Mockito.mock(XXXDao.class);
         Mockito.when(xxxDao.getMapBySql()).thenReturn(2);
         System.out.println(xxxDao.getMapBySql());
