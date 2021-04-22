@@ -1,6 +1,5 @@
-package com.xkcoding.smida.testDemo;
+package com.xkcoding.smida.mockMvcDemo;
 
-import com.xkcoding.smida.testDemo.XXXDao;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

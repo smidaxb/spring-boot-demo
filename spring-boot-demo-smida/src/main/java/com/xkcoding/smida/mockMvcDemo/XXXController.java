@@ -1,4 +1,4 @@
-package com.xkcoding.smida.testDemo;
+package com.xkcoding.smida.mockMvcDemo;
 
 import org.springframework.stereotype.Controller;
 

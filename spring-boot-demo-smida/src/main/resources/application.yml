@@ -2,3 +2,22 @@ server:
   port: 10001
   servlet:
     context-path: /testDemo
+
+#freeswitch配置
+##内联
+freeswitch:
+    inbound-host: 172.16.140.71
+    inbound-port: 8021
+    inbound-password: ClueCon
+    inbound-timeout: 60
+  ##呼叫命令
+    call-command: originate
+    call-gateway: callcenter-gw
+    call-gateway-addr: 114.55.105.73:5060
+  ##录音目录
+    record-file-path: /home/hermes/record/
+    record-prefix: http://172.16.140.71:808/
+  ##单端口
+    outbound-bd-port: 7800
+    outbound-rcr-port: 7801
+    outbound-tts-port: 7802

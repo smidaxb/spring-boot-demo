@@ -1,8 +1,6 @@
-package com.xkcoding.smida.testDemo;
+package com.xkcoding.smida.mockMvcDemo;
 
 import org.springframework.stereotype.Repository;
-
-import java.util.Map;
 
 /**
  * @author Created by YangYifan on 2020/8/11.

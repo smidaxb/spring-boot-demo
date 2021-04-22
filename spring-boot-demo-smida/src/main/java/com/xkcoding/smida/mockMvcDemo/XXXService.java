@@ -1,4 +1,4 @@
-package com.xkcoding.smida.testDemo;
+package com.xkcoding.smida.mockMvcDemo;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
