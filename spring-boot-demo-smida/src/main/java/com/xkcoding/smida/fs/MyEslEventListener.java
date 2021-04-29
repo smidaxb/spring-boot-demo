@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * @author yusong
  */
 @Slf4j
-@Service
+//@Service
 public class MyEslEventListener implements IEslEventListener {
 
     @Override

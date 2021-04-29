@@ -21,3 +21,5 @@ freeswitch:
     outbound-bd-port: 7800
     outbound-rcr-port: 7801
     outbound-tts-port: 7802
+
+

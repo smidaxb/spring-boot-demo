@@ -7,11 +7,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration("freeSwitchConfig")
+//@Configuration("freeSwitchConfig")
 @Slf4j
 @Data
-@EnableConfigurationProperties(FreeSwitchConfig.class)
-@ConfigurationProperties("freeswitch")
+//@EnableConfigurationProperties(FreeSwitchConfig.class)
+//@ConfigurationProperties("freeswitch")
 public class FreeSwitchConfig implements InitializingBean {
     private String inboundHost;
     private Integer inboundPort;

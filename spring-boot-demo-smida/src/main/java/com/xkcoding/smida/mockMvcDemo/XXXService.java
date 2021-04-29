@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 /**
  * @author Created by YangYifan on 2020/8/11.
  */
-@Service
+//@Service
 public class XXXService {
     @Autowired
     private XXXDao xxxDao;

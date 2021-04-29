@@ -5,6 +5,6 @@ import org.springframework.stereotype.Controller;
 /**
  * @author Created by YangYifan on 2020/8/13.
  */
-@Controller
+//@Controller
 public class XXXController {
 }

@@ -5,12 +5,15 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
+import io.reactivex.Observer;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.AsyncSubject;
 import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 import lombok.extern.slf4j.Slf4j;
 
@@ -195,7 +198,7 @@ public class RxDemo {
     /**
      * 滑动窗口demo
      */
-    public static BehaviorSubject<Integer> behaviorSubject = BehaviorSubject.create();
+    public static PublishSubject<Integer> behaviorSubject = PublishSubject.create();
 
     public static void testWindowSlideMy() throws InterruptedException {
         CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -203,46 +206,47 @@ public class RxDemo {
         for (int i = 0; i < 10; i++) {
             list.add(1);
         }
-        behaviorSubject
-            .subscribeOn(Schedulers.computation())
+        behaviorSubject.serialize()
+//            .subscribeOn(Schedulers.single())
             // timeSpan 秒作为一个基本块,横向移动
             .window(1000, TimeUnit.MILLISECONDS)
             //将flatMap汇总平铺成一个事件,然后累加成一个Observable<Integer>对象，比如说1s内有10个对象，被累加起来
             .flatMap(
                 (Function<Observable<Integer>, ObservableSource<Integer>>) integerObservable ->
                     integerObservable
-                        .reduce((sum, num) -> sum += num)
+                        .reduce(1,(sum, num) -> sum += num)
                         .toObservable())
-            .startWith(list)
-            .window(10, 1)
-            //对窗口里面的进行求和,用的scan, 每次累加都会打印出来
-            .flatMap(
-                (Function<Observable<Integer>, ObservableSource<Integer>>) integerObservable ->
-                    integerObservable
-                        .scan((sum, num) -> {
-//                            log.info("开始前： result {}, num = {}", sum, num);
-//                            log.info("ttttt:{}",Thread.currentThread().getName());
-                            return sum += num;
-                        })
-                        .skip(9)
-            )
-            .observeOn(Schedulers.single())
+//            .startWith(list)
+//            .window(10, 1)
+//            //对窗口里面的进行求和,用的scan, 每次累加都会打印出来
+//            .flatMap(
+//                (Function<Observable<Integer>, ObservableSource<Integer>>) integerObservable ->
+//                    integerObservable
+//                        .scan((sum, num) -> {
+////                            log.info("开始前： result {}, num = {}", sum, num);
+////                            log.info("ttttt:{}",Thread.currentThread().getName());
+//                            Thread.sleep(100);
+//                            return sum += num;
+//                        })
+//                        .skip(9)
+//            )
+            .observeOn(Schedulers.from(new ThreadPoolExecutor(1, 2, 10L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(10))))
             .subscribe((Integer integer) ->
                 // 输出统计数据到日志
                 log.info("[{}] call ...... {}", Thread.currentThread().getName(), integer));
-        for (int i = 0; i < 10; i++) {
-            Thread t = new Thread(new myR());
-            t.start();
-        }
+//        for (int i = 0; i < 10; i++) {
+//            Thread t = new Thread(new myR());
+//            t.start();
+//        }
         ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
-        Runnable special = new Runnable() {
-            @Override
-            public void run() {
-                behaviorSubject.onNext(0);
-                executor.schedule(this, 500, TimeUnit.MILLISECONDS);
-            }
-        };
-        executor.submit(special);
+//        Runnable special = new Runnable() {
+//            @Override
+//            public void run() {
+//                behaviorSubject.onNext(0);
+//                executor.schedule(this, 500, TimeUnit.MILLISECONDS);
+//            }
+//        };
+//        executor.submit(special);
         countDownLatch.await(1000, TimeUnit.SECONDS);
     }
 
@@ -252,8 +256,8 @@ public class RxDemo {
             for (int i = 0; i < 60; i++) {
                 //200ms生产一个数据，
                 Random random = new Random();
-                behaviorSubject.onNext(random.nextInt(5));
-//                behaviorSubject.onNext(i);
+//                behaviorSubject.onNext(random.nextInt(5));
+                behaviorSubject.onNext(1);
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException e) {
@@ -264,14 +268,47 @@ public class RxDemo {
     }
 
     public static void timeWindowTest() throws Exception {
-        Observable<Integer> source = Observable.interval(50, TimeUnit.MILLISECONDS).map(i -> new Random().nextInt(2));
-        source.window(1, TimeUnit.SECONDS).observeOn(Schedulers.computation()).subscribe(window -> {
-            int[] metrics = new int[2];
-            window.subscribe(i -> metrics[i]++,
-                throwable -> {
-                },
-                () -> System.out.println("窗口Metrics:" + JSON.toJSONString(metrics)));
-        });
+        Observer<Observable<Integer>> o = new Observer<Observable<Integer>>() {
+            @Override
+            public void onSubscribe(Disposable disposable) {
+
+            }
+
+            @Override
+            public void onNext(Observable<Integer> window) {
+                int[] metrics = new int[2];
+                window.subscribe(i -> metrics[i]++,
+                    throwable -> {
+                    },
+                    () -> System.out.println("窗口Metrics:" + JSON.toJSONString(metrics)));
+                log.info("next");
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        };
+        Observable<Integer> source = Observable
+            .interval(50, TimeUnit.MILLISECONDS)
+            .map(i -> new Random().nextInt(2));
+        source
+            .window(1, TimeUnit.SECONDS).
+            observeOn(Schedulers.computation())
+            .subscribe(o);
+//            .subscribe(window -> {
+//                int[] metrics = new int[2];
+//                window.subscribe(i -> metrics[i]++,
+//                    throwable -> {
+//                    },
+//                    () -> System.out.println("窗口Metrics:" + JSON.toJSONString(metrics)));
+//            });
+
         TimeUnit.SECONDS.sleep(5);
     }
 
