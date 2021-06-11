@@ -63,8 +63,9 @@ public class RxDemo2 {
     public static void main(String[] args) throws InterruptedException {
 //        baseCase();
         testWindowSlideMy();
-        Thread.sleep(50000);
-        publishSubject.onComplete();
+        Thread.sleep(500000);
+//        publishSubject.onComplete();
+
 
     }
 
@@ -109,14 +110,19 @@ public class RxDemo2 {
                 log.info("onNext ...... {}", integer));
 
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1; i++) {
             Thread t = new Thread(new Runnable() {
+                int i=0;
                 @SneakyThrows
                 @Override
                 public void run() {
                     while (true) {
                         publishSubject.onNext(1);
                         Thread.sleep(200);
+                        if (++i == 100) {
+                            publishSubject.onComplete();
+                            Thread.sleep(100000);
+                        }
                     }
                 }
             });

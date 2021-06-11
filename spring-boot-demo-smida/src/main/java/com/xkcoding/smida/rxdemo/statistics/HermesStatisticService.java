@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Created by YangYifan on 2021/4/27.
  */
-@Service
+//@Service
 @Slf4j
 public class HermesStatisticService implements InitializingBean {
     @Value("${statistics.freeSwitch.bucketSize}")
