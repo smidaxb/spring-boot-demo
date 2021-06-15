@@ -1,9 +1,8 @@
-package com.xkcoding.smida.fs;
+package com.xkcoding.smida.sunlands.fs;
 
 import lombok.extern.slf4j.Slf4j;
 import org.freeswitch.esl.client.IEslEventListener;
 import org.freeswitch.esl.client.transport.event.EslEvent;
-import org.springframework.stereotype.Service;
 
 /**
  * 事件监听器

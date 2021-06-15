@@ -1,4 +1,4 @@
-package com.xkcoding.smida.fs;
+package com.xkcoding.smida.sunlands.fs;
 
 /**
  * FreeSwitch 事件列表

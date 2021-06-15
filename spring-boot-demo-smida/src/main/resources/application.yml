@@ -1,7 +1,23 @@
 server:
-  port: 10001
+  port: 10010
   servlet:
-    context-path: /testDemo
+    context-path: /demo
+spring:
+  datasource:
+    url: jdbc:mysql://172.16.116.100:3307/dragnet_icall?useUnicode=true&characterEncoding=UTF-8&useSSL=false&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT%2B8
+    username: icall_admin
+    password: lS3OPeMdwELrJ
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      minimum-idle: 5
+      connection-test-query: SELECT 1 FROM DUAL
+      maximum-pool-size: 20
+      auto-commit: true
+      idle-timeout: 30000
+      pool-name: SpringBootDemoHikariCP
+      max-lifetime: 60000
+      connection-timeout: 30000
 
 #freeswitch配置
 ##内联

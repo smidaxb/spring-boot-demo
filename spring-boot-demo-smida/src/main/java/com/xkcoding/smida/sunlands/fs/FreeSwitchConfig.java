@@ -1,11 +1,8 @@
-package com.xkcoding.smida.fs;
+package com.xkcoding.smida.sunlands.fs;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
 //@Configuration("freeSwitchConfig")
 @Slf4j

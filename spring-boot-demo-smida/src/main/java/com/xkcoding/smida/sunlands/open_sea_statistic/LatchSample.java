@@ -1,4 +1,4 @@
-package com.xkcoding.smida.open_sea_statistic;
+package com.xkcoding.smida.sunlands.open_sea_statistic;
 
 import java.util.concurrent.*;
 
