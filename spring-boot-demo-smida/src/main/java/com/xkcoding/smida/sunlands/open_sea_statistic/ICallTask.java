@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * @author Created by YangYifan on 2021/6/11.
  */
-@Component
+//@Component
 @Slf4j
 public class ICallTask {
     @Autowired

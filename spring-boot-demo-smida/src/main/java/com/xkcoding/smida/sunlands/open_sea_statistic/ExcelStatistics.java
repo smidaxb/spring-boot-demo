@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * @author Created by YangYifan on 2021/5/31.
  */
-public class MyStat {
+public class ExcelStatistics {
     public static void main(String[] args) throws Exception {
         File file1 = new File("D:\\1111.txt");
         LinkedHashMap<String, Integer> map1 = new LinkedHashMap<>();
